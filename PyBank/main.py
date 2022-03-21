@@ -54,12 +54,31 @@ with open(csvpath) as csvfile:
     # divide total month-to-month changes in profit by the number of months (minus Jan-10 since that's the starting value)
     average_change = sum_change / (len(change_profit_loss) - 1)
 
+# format dollar amounts as currency
+net_amount = "${:,.2f}".format(net_amount)
+average_change = "${:,.2f}".format(average_change)
+greatest_increase = "${:,.2f}".format(greatest_increase)
+greatest_decrease = "${:,.2f}".format(greatest_decrease)
 
-# print results to the terminal
-print("Financial Analysis ")
-print("--------------------------- ")
-print(f"Total Months: {month_count} ")
-print(f"Total: {net_amount} ")
-print(f"Average Change: {average_change} ")
-print(f"Greatest Increase in Profits: {month_year[increase_ind]} {greatest_increase} ")
-print(f"Greatest Decrease in Profits: {month_year[decrease_ind]} {greatest_decrease} ")
+# generate list that summarizes each line of output
+output_list =  ["Financial Analysis ",
+                "--------------------------- ",
+                f"Total Months: {month_count} ",
+                f"Total: {net_amount} ",
+                f"Average Change: {average_change} ",
+                f"Greatest Increase in Profits: {month_year[increase_ind]} ({greatest_increase}) ",
+                f"Greatest Decrease in Profits: {month_year[decrease_ind]} ({greatest_decrease}) "]
+
+
+# loop through lines of output and print to terminal
+for line in output_list:
+    print(line)
+
+
+# export results into a .txt file
+output_path = os.path.join('Analysis','pybank-results.txt')
+
+with open(output_path, 'w') as txtout:
+    txtout.write('\n'.join(output_list))
+
+
