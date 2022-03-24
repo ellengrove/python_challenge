@@ -7,50 +7,57 @@ with open(csvpath) as csvfile:
     csvreader = csv.reader(csvfile,delimiter = ",")
 
     csv_header = next(csvreader)
-    # print(csv_header)
 
-    candidate_votes_all = []
-    vote_count = 0
+    # initialize empty list to hold every candidate name in the csv 
+    # loop throw csv rows and store candidate names
+    candidates_long = []
     for row in csvreader:
-        vote_count = vote_count + 1
-        candidate_votes_all.append(row[2])
+        candidates_long.append(row[2])
 
-    candidates = []
-    # get list of all candidates
-    # consider using list compression
-    for candidate in candidate_votes_all:
-        if candidate not in candidates:
-            candidates.append(candidate)
+    # count the number of elements in cadidates_long
+    # (analagous to number of votes cast)
+    vote_count = len(candidates_long)
 
+    # initialize empty list to retain each candidate's name once
+    # use list comprehension to append unique candidate names to candidates_short
+    candidates_short = []
+    [candidates_short.append(cand) for cand in candidates_long if cand not in candidates_short]
 
-    candidate_votes = []
-    candidate_vote_percent = []
-    tally = 0
-    for candidate in candidates:
-        for vote in candidate_votes_all:
-            if vote == candidate:
-                tally = tally + 1
-        candidate_votes.append(tally)
-        candidate_vote_percent.append("{0:.3%}".format((tally / vote_count)))
-        tally = 0
-
-winner_votes = max(candidate_votes)
-winner = candidates[candidate_votes.index(winner_votes)]
-
-# improve this 
-output_list = ["Election Results ",
-               "---------------------------- ",
-               f"Total Votes: {vote_count} ",
-               "---------------------------- ",
-               f"{candidates[0]}: {candidate_vote_percent[0]} ({candidate_votes[0]})",
-               f"{candidates[1]}: {candidate_vote_percent[1]} ({candidate_votes[1]})",
-               f"{candidates[2]}: {candidate_vote_percent[2]} ({candidate_votes[2]})",
-               "---------------------------- ",
-               f"Winner: {winner}"]
+    # initialize empty lists to store vote counts/percentages for each candidate
+    cand_count = []
+    cand_count_percent = []
+    for cand in candidates_short:
+        count = candidates_long.count(cand)
+        cand_count.append(count)
+        percent_count = candidates_long.count(cand)/vote_count
+        cand_count_percent.append("{0:.3%}".format(percent_count))
 
 
+# determine the greatest number of votes and the winning candidate
+winner_votes = max(cand_count)
+winner = candidates_short[cand_count.index(winner_votes)]
 
+# initialize empty list to contain the different lines of output
+output_list = []
+output_list.append("Election Results ")
+output_list.append("---------------------------- ")
+output_list.append(f"Total Votes: {vote_count} ")
+
+# loop through all the candidates and print their results
+for x in range(len(candidates_short)):
+    output_list.append(f"{candidates_short[x]}: {cand_count_percent[x]} ({cand_count[x]})")
+
+output_list.append("---------------------------- ")
+output_list.append(f"Winner: {winner} ")
+
+# print output to terminal
 for line in output_list:
     print(line)
+
+# export results into a .txt file
+output_path = os.path.join('Analysis','pypoll-results.txt')
+
+with open(output_path, 'w') as txtout:
+    txtout.write('\n'.join(output_list))
 
                
